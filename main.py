@@ -1,6 +1,8 @@
-from fastapi import FastAPI
 from enum import Enum
 from typing import Optional
+
+from fastapi import FastAPI, status, Response
+
 app = FastAPI()
 
 @app.get("/hello")
@@ -63,5 +65,48 @@ def get_comment(id: int, comment_id: int, valid: bool = True, username: Optional
     return {'message': f'blog id = {id}, comment_id = {comment_id}, valid = {valid}, username = {username}'}
 
 
+################################################################
+#---------------------STATUS CODE PARAMETERS--------------------
+################################################################
+
+@app.get("/blog6/{id}",  status_code=status.HTTP_200_OK)
+def get_blog_with_statuscode(id:int, response: Response):
+    if id > 5:
+        # response.status_code = status.HTTP_200_OK
+        return {"message": f"Blog with {id}"}
+    else :
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"message": f"Blog with {id} not found"}
 
 
+################################################################
+#------------------------TAG PARAMETERS-------------------------
+################################################################
+
+@app.get("/blog7/{id}", tags=['blog7'])
+def get_blog_with_tag(id: int):
+    return {'message':"this is blog tag"}
+
+@app.get("/blog7/{id}/comments/{comment_id}", tags=['blog7','comments'])
+def get_comment(id: int, comment_id: int, valid: bool = True, username: Optional[str] = None):
+    return {'message': f'blog id = {id}, comment_id = {comment_id}, valid = {valid}, username = {username}'}
+
+################################################################
+#----------------SUMMARY AND DESCRIPTION------------------------
+################################################################
+
+@app.get("/blog8/all", tags=['summary and description'], summary="Retrieve All Blogs", description="This api simulates fetching all blogs")
+def get_blog_with_summary():
+    return {'message': 'This api simulates fetching all blogs'}
+
+@app.get("/blog5/{id}/comments/{comment_id}", tags=['summary and description'])
+def get_comment(id: int, comment_id: int, valid: bool = True, username: Optional[str] = None):
+    """
+    simulates retriving blogs
+
+    - **id** mandatody path parameter
+    - **comment** mandatody path parameter
+    - **valid** query parameter
+    - **username** optional query parameter
+    """
+    return {'message': f'blog id = {id}, comment_id = {comment_id}, valid = {valid}, username = {username}'}
