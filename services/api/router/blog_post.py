@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Query
+from fastapi import APIRouter, Body, Query, Path
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -56,3 +56,22 @@ def create_comment(blog: BlogModel, id:int, comment_id: int = Query(None, title=
             'comment_id': comment_id,
             'content': content,
             'version': v}
+
+################################################################
+#--------------------NUMBER VALIDATORS -------------------------
+################################################################
+
+@router.post("/new2/{id}/comment/{comment_id}")
+def create_comment(blog: BlogModel, id:int, comment_title: int = Query(None, title="title of the comment", 
+                                                                description="somedscription of title",
+                                                                alias="TitletID",
+                                                                deprecated=True),
+                                                                content: str = Body(..., min_length=5, max_length=50, regex='^[a-z\s]*$'),
+                                                                v:Optional[List[str]] = Query(['1.0','1.1','1.2']),
+                                                                comment_id: int = Path(None, gt=5, le=10)):
+    return {'blog': blog,
+            'id': id,
+            'comment_title': comment_title,
+            'content': content,
+            'version': v,
+            'comment_id': comment_id}
