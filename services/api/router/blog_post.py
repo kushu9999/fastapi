@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, Query, Path
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 router = APIRouter(prefix="/blog", tags=['blog'])
 
@@ -75,3 +75,31 @@ def create_comment(blog: BlogModel, id:int, comment_title: int = Query(None, tit
             'content': content,
             'version': v,
             'comment_id': comment_id}
+
+################################################################
+#--------------------COMPLEX SUBTYPES --------------------------
+################################################################
+
+#  Pydantic is not resticted to simple types
+#  We can also use List, Dict etc....,
+
+# custom subtypes
+class Image(BaseModel):
+    url: str
+    alias: str
+
+# created model for data input
+class BlogModel2(BaseModel):
+    title: str
+    content: str
+    comments: int
+    published: Optional[bool]
+    tags: List[str] = None
+    metadata: Dict[str,str] = {'key1':'val1'}
+    image: Optional[Image] = None
+
+# post request
+@router.post("/new6/complex")
+def create_blog(blog: BlogModel2):
+    return blog
+
